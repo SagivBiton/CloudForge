@@ -25,7 +25,7 @@ from pydantic_ai import Agent, RunContext
 
 from cloudforge import settings
 from cloudforge.models.discovery import S3DiscoveryConfig
-from cloudforge.validation.aws_dryrun import FIELD_VALIDATORS
+from external_infra_microservice.public_utils import FIELD_VALIDATORS
 
 
 # ---------------------------------------------------------------------------

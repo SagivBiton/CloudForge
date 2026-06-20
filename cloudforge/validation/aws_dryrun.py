@@ -11,28 +11,10 @@ agent can self-correct.
 
 from __future__ import annotations
 
-from typing import Any, Callable
+from typing import Any
 
 from cloudforge.models.discovery import S3DiscoveryConfig
-
-# ---------------------------------------------------------------------------
-# Field → boto3 mapping
-# ---------------------------------------------------------------------------
-
-FIELD_VALIDATORS: dict[str, Callable[[Any, str], Any]] = {
-    "bucket_name":           lambda s3, b: b,                                           # always present from list_buckets
-    "region":                lambda s3, b: s3.get_bucket_location(Bucket=b),
-    "creation_date":         lambda s3, b: b,                                           # comes from list_buckets response
-    "encryption_status":     lambda s3, b: s3.get_bucket_encryption(Bucket=b),
-    "public_access_blocked": lambda s3, b: s3.get_public_access_block(Bucket=b),
-    "versioning_status":     lambda s3, b: s3.get_bucket_versioning(Bucket=b),
-    "tags":                  lambda s3, b: s3.get_bucket_tagging(Bucket=b),
-    "acl":                   lambda s3, b: s3.get_bucket_acl(Bucket=b),
-    "lifecycle_rules":       lambda s3, b: s3.get_bucket_lifecycle_configuration(Bucket=b),
-    "logging_enabled":       lambda s3, b: s3.get_bucket_logging(Bucket=b),
-    "object_lock_enabled":   lambda s3, b: s3.get_object_lock_configuration(Bucket=b),
-    "replication_config":    lambda s3, b: s3.get_bucket_replication(Bucket=b),
-}
+from external_infra_microservice.public_utils import FIELD_VALIDATORS
 
 # ---------------------------------------------------------------------------
 # "Empty config" error codes — these mean the field is real but not configured.
@@ -69,7 +51,6 @@ def run_dryrun(
         try:
             validator(s3, bucket)
         except Exception as exc:
-            # Check for botocore ClientError (real or fake)
             error_code = _extract_error_code(exc)
             if error_code and error_code in _EMPTY_CONFIG_CODES:
                 continue  # ✅ field is real, just not configured on this bucket
