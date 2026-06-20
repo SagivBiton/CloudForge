@@ -14,8 +14,6 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
-import yaml
-
 from cloudforge import settings
 from cloudforge.agent.modifier import run_modifier
 from cloudforge.github_app import commenter, pr as pr_module
@@ -43,21 +41,25 @@ def _ts() -> str:
 
 
 def _load_yaml_from_repo(repo: Any) -> str:
-    """Load the current YAML config from the repository.
+    """Load the current YAML config from the GitHub repository.
 
-    Works for both real PyGitHub.ContentFile (decoded_content is a `bytes`
-    property) and FakeContentFile (matching property).
-    Falls back to local disk if the file is missing on the repo.
+    PyGitHub's ContentFile.decoded_content is a bytes property (base64-decoded).
+    Falls back to local disk only when the file is genuinely missing on the repo.
     """
     try:
         contents = repo.get_contents(_YAML_PATH)
         raw = contents.decoded_content  # property → bytes
         return raw.decode() if isinstance(raw, (bytes, bytearray)) else str(raw)
-    except FileNotFoundError:
+    except Exception:
+        # If the file cannot be fetched from the repo, fall back to the local copy.
+        # This handles first-run scenarios and CLI usage.
         local = Path(_YAML_PATH)
         if local.exists():
             return local.read_text()
-        raise RuntimeError(f"Could not load {_YAML_PATH} from repo or disk")
+        raise RuntimeError(
+            f"Could not load '{_YAML_PATH}' from GitHub or from local disk. "
+            "Ensure the file exists in the repository."
+        )
 
 
 def handle_issue(issue: Any, repo: Any) -> None:
@@ -110,17 +112,10 @@ def run_forever(poll_interval: int | None = None) -> None:
     interval = poll_interval if poll_interval is not None else settings.POLL_INTERVAL_SEC
     repo = get_repo()
 
-    # Seed the YAML in FakeRepo so get_contents() finds it
-    if hasattr(repo, "add_file"):
-        local = Path(_YAML_PATH)
-        if local.exists():
-            repo.add_file(_YAML_PATH, local.read_text())
-
     processed = _load_processed()
     print(
         f"CloudForge running. "
-        f"Polling every {interval}s for issues labeled '{_LABEL}' "
-        f"(mode={settings.MODE!r})"
+        f"Polling every {interval}s for issues labeled '{_LABEL}'"
     )
 
     while True:

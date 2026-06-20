@@ -34,7 +34,7 @@ from cloudforge.validation.aws_dryrun import FIELD_VALIDATORS
 
 @dataclass
 class ModifierDeps:
-    s3_client: Any                      # real boto3 client or InMemoryS3
+    s3_client: Any                      # boto3 S3 client (from get_s3_client())
     context_roots: dict[str, str]       # alias → absolute directory path
     docs_cache_dir: Path                # on-disk cache for boto3 docstrings
 

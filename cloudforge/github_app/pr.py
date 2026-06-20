@@ -35,24 +35,19 @@ def open_pr(
     2. Commit the updated YAML.
     3. Open a Pull Request.
 
-    Returns the PR object (real or FakePR).
+    Returns the PR object.
     """
     branch_name = f"feature/issue-{issue_number}-{_slugify(issue_title)}"
 
     # Resolve the current HEAD sha
-    try:
-        base_ref = repo.get_git_ref(f"refs/heads/{base_branch}")
-        head_sha = base_ref.object.sha
-    except Exception:
-        # Fallback for FakeRepo
-        base_branch_obj = repo.get_branch(base_branch)
-        head_sha = base_branch_obj.commit.sha
+    base_ref = repo.get_git_ref(f"heads/{base_branch}")
+    head_sha = base_ref.object.sha
 
     # Create the new branch
     repo.create_git_ref(ref=f"refs/heads/{branch_name}", sha=head_sha)
 
-    # Fetch the current file to get its sha (needed by GitHub API).
-    # FakeRepo raises FileNotFoundError; real PyGitHub raises UnknownObjectException.
+    # Fetch the current file to get its sha (needed by GitHub API for updates).
+    # UnknownObjectException is raised by PyGitHub when the file doesn't exist.
     try:
         existing = repo.get_contents(yaml_path, ref=base_branch)
         file_sha = existing.sha
