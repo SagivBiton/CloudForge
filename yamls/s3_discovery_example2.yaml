@@ -7,4 +7,5 @@ fields:
 - bucket_name
 - region
 - versioning_status
+- lifecycle_rules
 filters: []
