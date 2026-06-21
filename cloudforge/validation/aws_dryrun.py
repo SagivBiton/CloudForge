@@ -14,7 +14,7 @@ from __future__ import annotations
 from typing import Any
 
 from cloudforge.models.discovery import S3YamlConfig
-from external_infra_microservice.public_utils import FIELD_VALIDATORS
+from external_infra_library.public_utils import FIELD_VALIDATORS
 
 # ---------------------------------------------------------------------------
 # "Empty config" error codes — these mean the field is real but not configured.
