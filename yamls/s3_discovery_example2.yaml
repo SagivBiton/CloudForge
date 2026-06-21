@@ -7,4 +7,5 @@ fields:
 - bucket_name
 - region
 - versioning_status
+- public_access_blocked
 filters: []
