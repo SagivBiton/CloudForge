@@ -13,7 +13,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from cloudforge.models.discovery import S3DiscoveryConfig
+from cloudforge.models.discovery import S3YamlConfig
 from external_infra_microservice.public_utils import FIELD_VALIDATORS
 
 # ---------------------------------------------------------------------------
@@ -32,7 +32,7 @@ _EMPTY_CONFIG_CODES: frozenset[str] = frozenset({
 
 
 def run_dryrun(
-    cfg: S3DiscoveryConfig,
+    cfg: S3YamlConfig,
     s3: Any,
     bucket: str,
 ) -> tuple[bool, str | None]:

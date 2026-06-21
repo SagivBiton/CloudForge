@@ -23,17 +23,17 @@ from cloudforge import settings
 from cloudforge.agent.prompts import SYSTEM_PROMPT, build_user_message
 from cloudforge.agent.tools import ModifierDeps, register_tools
 from cloudforge.infra.aws import get_s3_client
-from cloudforge.models.discovery import S3DiscoveryConfig
+from cloudforge.models.discovery import S3YamlConfig
 from cloudforge.validation.aws_dryrun import run_dryrun
 
 # ---------------------------------------------------------------------------
 # Agent definition
 # ---------------------------------------------------------------------------
 
-modifier_agent: Agent[ModifierDeps, S3DiscoveryConfig] = Agent(
+modifier_agent: Agent[ModifierDeps, S3YamlConfig] = Agent(
     model=settings.OPENAI_MODEL,
     deps_type=ModifierDeps,
-    output_type=S3DiscoveryConfig,
+    output_type=S3YamlConfig,
     system_prompt=SYSTEM_PROMPT,
     retries=settings.AGENT_RETRIES,
 )
@@ -43,8 +43,8 @@ register_tools(modifier_agent)
 @modifier_agent.output_validator
 def _aws_dryrun_validator(
     ctx: RunContext[ModifierDeps],
-    output: S3DiscoveryConfig,
-) -> S3DiscoveryConfig:
+    output: S3YamlConfig,
+) -> S3YamlConfig:
     """
     After Pydantic schema validation, confirm each field maps to a real boto3 call.
     If not, raise ModelRetry so the agent can self-correct.
@@ -86,7 +86,7 @@ def run_modifier(
     issue_title: str,
     issue_body: str,
     current_yaml: str,
-) -> S3DiscoveryConfig:
+) -> S3YamlConfig:
     """
     Run the modifier agent and return a validated S3DiscoveryConfig.
 

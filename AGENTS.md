@@ -22,12 +22,12 @@ Built on **Pydantic AI** (`pydantic-ai-slim[openai]>=1.100.0`).
 
 ```python
 from pydantic_ai import Agent, RunContext, ModelRetry
-from cloudforge.models.discovery import S3DiscoveryConfig
+from cloudforge.models.discovery import S3YamlConfig
 
 modifier_agent = Agent(
     model=settings.OPENAI_MODEL,
     deps_type=ModifierDeps,
-    output_type=S3DiscoveryConfig,   # auto-validated; auto-retry on failure
+    output_type=S3YamlConfig,  # auto-validated; auto-retry on failure
     system_prompt=SYSTEM_PROMPT,
     retries=settings.AGENT_RETRIES,
 )

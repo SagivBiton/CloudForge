@@ -24,7 +24,7 @@ class Filter(BaseModel):
     value: Optional[str] = None  # not required for "exists"
 
 
-class S3DiscoveryConfig(BaseModel):
+class S3YamlConfig(BaseModel):
     version: str
     provider: Literal["aws"]
     resource_type: Literal["s3"]

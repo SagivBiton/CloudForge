@@ -9,6 +9,7 @@ failure comment.
 from __future__ import annotations
 
 import json
+import re
 import time
 from datetime import datetime
 from pathlib import Path
@@ -20,7 +21,7 @@ from cloudforge.github_app import commenter, pr as pr_module
 from cloudforge.infra.github import get_repo
 
 _STATE_PATH = Path("state/processed_issues.json")
-_YAML_PATH = "yamls/s3_discovery.yaml"
+_YAML_PATH = "yamls/"
 _LABEL = "discovery-request"
 
 
@@ -40,24 +41,24 @@ def _ts() -> str:
     return datetime.now().strftime("[%H:%M:%S]")
 
 
-def _load_yaml_from_repo(repo: Any) -> str:
+def _load_yaml_from_repo(repo: Any, yaml_name: str) -> str:
     """Load the current YAML config from the GitHub repository.
 
     PyGitHub's ContentFile.decoded_content is a bytes property (base64-decoded).
     Falls back to local disk only when the file is genuinely missing on the repo.
     """
     try:
-        contents = repo.get_contents(_YAML_PATH)
+        contents = repo.get_contents(f"{_YAML_PATH}{yaml_name}")
         raw = contents.decoded_content  # property → bytes
         return raw.decode() if isinstance(raw, (bytes, bytearray)) else str(raw)
     except Exception:
         # If the file cannot be fetched from the repo, fall back to the local copy.
         # This handles first-run scenarios and CLI usage.
-        local = Path(_YAML_PATH)
+        local = Path(f"{_YAML_PATH}{yaml_name}")
         if local.exists():
             return local.read_text()
         raise RuntimeError(
-            f"Could not load '{_YAML_PATH}' from GitHub or from local disk. "
+            f"Could not load {_YAML_PATH}{yaml_name} from GitHub or from local disk. "
             "Ensure the file exists in the repository."
         )
 
@@ -66,7 +67,14 @@ def handle_issue(issue: Any, repo: Any) -> None:
     """Process a single GitHub Issue end-to-end."""
     print(f"{_ts()} New issue detected: #{issue.number} — {issue.title!r}")
 
-    current_yaml = _load_yaml_from_repo(repo)
+    update_yaml = re.findall(r'\b[\w.-]+\.(?:yaml|yml)\b', issue.title)
+
+    if update_yaml:
+        yaml_name = update_yaml[0]
+        current_yaml = _load_yaml_from_repo(repo, yaml_name)
+    else:
+        raise("Couldn't get YAML file specification")
+
     print(f"{_ts()} Current YAML loaded")
 
     print(f"{_ts()} Starting Pydantic AI modifier...")
@@ -89,7 +97,7 @@ def handle_issue(issue: Any, repo: Any) -> None:
             issue_number=issue.number,
             issue_title=issue.title,
             config=config,
-            yaml_path=_YAML_PATH,
+            yaml_path=f"{_YAML_PATH}{yaml_name}",
         )
     except Exception as exc:
         print(f"{_ts()} ❌ PR creation failed: {exc}")

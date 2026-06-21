@@ -10,7 +10,7 @@ import re
 import yaml
 from typing import Any
 
-from cloudforge.models.discovery import S3DiscoveryConfig
+from cloudforge.models.discovery import S3YamlConfig
 
 
 def _slugify(text: str) -> str:
@@ -26,7 +26,7 @@ def open_pr(
     repo: Any,
     issue_number: int,
     issue_title: str,
-    config: S3DiscoveryConfig,
+    config: S3YamlConfig,
     yaml_path: str = "yamls/s3_discovery.yaml",
     base_branch: str = "main",
 ) -> Any:

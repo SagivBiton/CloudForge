@@ -24,7 +24,7 @@ from typing import Any
 from pydantic_ai import Agent, RunContext
 
 from cloudforge import settings
-from cloudforge.models.discovery import S3DiscoveryConfig
+from cloudforge.models.discovery import S3YamlConfig
 from external_infra_microservice.public_utils import FIELD_VALIDATORS
 
 
@@ -102,7 +102,7 @@ def get_schema_definition() -> dict[str, Any]:
     Return the JSON schema for S3DiscoveryConfig.
     Use this when you need to re-check constraints after a validation error.
     """
-    return S3DiscoveryConfig.model_json_schema()
+    return S3YamlConfig.model_json_schema()
 
 
 # ---------------------------------------------------------------------------
@@ -243,7 +243,7 @@ def read_context_file(ctx: RunContext[ModifierDeps], path: str) -> str:
 # Register all tools on the agent
 # ---------------------------------------------------------------------------
 
-def register_tools(agent: Agent[ModifierDeps, S3DiscoveryConfig]) -> None:
+def register_tools(agent: Agent[ModifierDeps, S3YamlConfig]) -> None:
     """Attach all five tools to the modifier agent."""
     agent.tool_plain(get_field_validator_map)
     agent.tool_plain(get_schema_definition)
