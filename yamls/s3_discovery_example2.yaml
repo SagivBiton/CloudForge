@@ -1,11 +1,10 @@
-version: "1.0"
+version: '1.0'
 provider: aws
 resource_type: s3
-description: "Discover S3 bucket configurations for security scanning example 2"
+description: Discover S3 bucket configurations for security scanning example 2
 region: all
-
 fields:
-  - bucket_name
-  - region
-
+- bucket_name
+- region
+- versioning_status
 filters: []
