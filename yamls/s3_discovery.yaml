@@ -11,4 +11,5 @@ fields:
 - public_access_blocked
 - tags
 - versioning_status
+- object_lock_enabled
 filters: []
