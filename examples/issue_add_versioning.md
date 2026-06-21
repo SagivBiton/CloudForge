@@ -1,10 +1,10 @@
-[discovery-request] Add versioning_status to S3 discovery
+[discovery-request][s3_discovery.yaml] Add object_lock_enabled to S3 discovery
 
-The scanning team requires versioning information to identify buckets
-where versioning is disabled. This is needed to flag buckets that lack
-protection against accidental deletion.
+The compliance team requires object lock information to identify buckets that have protection against object deletion or modification. 
 
-Please add versioning_status to the S3 discovery YAML.
+This is needed to verify compliance with data retention and immutability requirements for regulated data.
 
-Requested by: scanning-team
+Please add object_lock_enabled to the S3 discovery YAML.
+
+Requested by: compliance-team
 Priority: medium
